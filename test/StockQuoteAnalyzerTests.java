@@ -151,7 +151,7 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	//Test for issue #4
-    @Test
+    @Test(expectedExceptions = InvalidAnalysisState.class)
 	public void testShouldGetChangeSinceLastCheckOneUpdate() throws Exception
 	{
 		// Arrange - Setup the expected calls.
@@ -162,7 +162,8 @@ public class StockQuoteAnalyzerTests {
 		analyzer.refresh();
 
 		// Assert
-		Assert.assertEquals(0.0, analyzer.getChangeSinceLastCheck());
+		analyzer.getChangeSinceLastCheck();
+//		Assert.assertEquals(0.0, analyzer.getChangeSinceLastCheck());
 	}
 
 	@DataProvider

@@ -99,13 +99,7 @@ public class StockQuoteAnalyzer {
 			//Fixes issue number 2 where the wrong exception was thrown here
 			throw new NullPointerException("The source for stock quotes can not be null");
 		}
-		//Part of the fix for issue #4, currentQuote should be initialized when the analyzer is created
-		try{
-			this.currentQuote = stockQuoteSource.getCurrentQuote();
 
-		}catch (Exception e){
-			this.currentQuote = null;
-		}
 		this.stockQuoteSource = stockQuoteSource;
 		this.audioPlayer = audioPlayer;
 	}
