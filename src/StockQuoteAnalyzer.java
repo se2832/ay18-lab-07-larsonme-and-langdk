@@ -88,10 +88,12 @@ public class StockQuoteAnalyzer {
 		super();
 
 		// Check the validity of the symbol.
-		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol) != true) {
+		// Used to check if it was invalid, now it checks to see if it is valid to help fix issue 1
+		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol)) {
 			this.symbol = symbol;
 		} else {
-			throw new StockTickerConnectionError("Symbol " + symbol + "not found.");
+			//Fixes issue #1, where the wrong exception was being thrown
+			throw new InvalidStockSymbolException("Symbol " + symbol + "not found.");
 		}
 		if (stockQuoteSource == null) {
 			throw new InvalidStockSymbolException("The source for stock quotes can not be null");
