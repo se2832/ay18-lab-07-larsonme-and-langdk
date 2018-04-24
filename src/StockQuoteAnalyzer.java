@@ -160,13 +160,14 @@ public class StockQuoteAnalyzer {
 	/**
 	 * This method will return the previous open for the given stock.
 	 * 
-	 * @return The previous closing value for the stock will be returned.
+	 * @return The previous opening value for the stock will be returned.
 	 * @throws InvalidAnalysisState
 	 *             An InvalidAnalysisState Exception will be thrown if a quote
 	 *             has not yet been retrieved.
 	 */
 	public double getPreviousOpen() throws InvalidAnalysisState {
-		if (currentQuote != null) {
+		//Fix for issue #3, the line used to be if (currentQuote != null) but that was incorrect
+		if (previousQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
 		return currentQuote.getOpen();

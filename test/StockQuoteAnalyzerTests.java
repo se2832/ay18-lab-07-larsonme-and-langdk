@@ -70,7 +70,8 @@ public class StockQuoteAnalyzerTests {
 
 		//Assert
 	}
-	
+
+	//Test for issue #3
 	@Test(expectedExceptions = InvalidAnalysisState.class)
 	public void testShouldThrowExceptionWhenGetPreviousOpenInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
