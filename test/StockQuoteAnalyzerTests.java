@@ -136,6 +136,7 @@ public class StockQuoteAnalyzerTests {
 	public void testShouldPlayAppropriateAudioWhenNoValidUpdates() throws Exception
 	{
 		// Arrange - setup the expected calls.
+        //TODO Telling the mocked generator to return null when getCurrentQuote is called
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(null);
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
@@ -149,6 +150,7 @@ public class StockQuoteAnalyzerTests {
 		verify(mockedStockTickerAudio, times(0)).playSadMusic();
 	}
 
+	//Test for issue #4
     @Test
 	public void testShouldGetChangeSinceLastCheckOneUpdate() throws Exception
 	{
