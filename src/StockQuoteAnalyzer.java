@@ -144,7 +144,9 @@ public class StockQuoteAnalyzer {
 				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()>1.00)) {
 					audioPlayer.playHappyMusic();
 				}
-				if ((this.getPercentChangeSinceOpen() < 0) && (this.getChangeSinceLastCheck()<1.00)) {
+				//Fix for issue #6.  Changed if statement to else if since you won't play happy and sad tones at the same time
+				//Also changed this.getPercentChangeSinceOpen() < 0 to <= 1 and the || in the middle used to be &&
+				else if ((this.getPercentChangeSinceOpen() <= -1) || (this.getChangeSinceLastCheck()<-1.00)) {
 					audioPlayer.playSadMusic();
 				}
 			} catch (InvalidAnalysisState e) {

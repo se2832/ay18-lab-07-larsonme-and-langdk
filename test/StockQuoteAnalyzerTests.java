@@ -170,7 +170,7 @@ public class StockQuoteAnalyzerTests {
 	public Object[][] normalOperationDataProvider() {
 		return new Object[][] {
 				{ new StockQuote("F", 100.00, 100.00, 0.00), new StockQuote("F", 100.00, 100.00, 0.00), 0, 0, 0.0 }, // No
-																														// change.
+//																														// change.
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 100.99, 0.99), 0, 0, 0.99 }, // .99%
 				// increase
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 101.00, 1.0), 0, 0, 1.0 }, // 1.0%
@@ -184,7 +184,7 @@ public class StockQuoteAnalyzerTests {
 																														// change.
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 99.01, -0.99), 0, 0, -0.99 }, // .99%
 				// decrease
-				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 99.00, -1.0), 0, 0, -1.0 }, // 1.0%
+				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 99.00, -1.0), 0, 1, -1.0 }, // 1.0%
 																														// decrease
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 98.99, -1.01), 0, 1, -1.01 }, // 1.01%
 				// decrease
@@ -192,7 +192,7 @@ public class StockQuoteAnalyzerTests {
 				// decrease
 		};
 	}
-	//Tests issue #5
+	//Tests issue #5 and #6
 	@Test(dataProvider = "normalOperationDataProvider")
 	public void testGetPercentChangeSinceLastOpenShouldReturnCorrectPercentChangedWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 			double percentChange) throws Exception {
@@ -214,13 +214,14 @@ public class StockQuoteAnalyzerTests {
 		verify(mockedStockQuoteGenerator, times(2)).getCurrentQuote();
 
 		// verify that method was never called on a mock
-//		verify(mockedStockTickerAudio, never()).playErrorMusic();
+		verify(mockedStockTickerAudio, never()).playErrorMusic();
 		//This tests issue #5
 		verify(mockedStockTickerAudio, times(happyMusicCount)).playHappyMusic();
-//		verify(mockedStockTickerAudio, times(sadMusicCount)).playSadMusic();
+		//This tests issue #6
+		verify(mockedStockTickerAudio, times(sadMusicCount)).playSadMusic();
 
 		// Now check that the change calculation was correct.
-//		Assert.assertEquals(analyzer.getPercentChangeSinceOpen(), percentChange, 0.01);
+		Assert.assertEquals(analyzer.getPercentChangeSinceOpen(), percentChange, 0.01);
 	}
 	
 	
