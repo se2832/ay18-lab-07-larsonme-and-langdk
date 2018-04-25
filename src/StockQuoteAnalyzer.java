@@ -36,6 +36,8 @@ import exceptions.InvalidAnalysisState;
 import exceptions.InvalidStockSymbolException;
 import exceptions.StockTickerConnectionError;
 
+import java.text.DecimalFormat;
+
 /**
  * @author schilling
  * 
@@ -138,7 +140,8 @@ public class StockQuoteAnalyzer {
 	public void playAppropriateAudio() {
 		if (audioPlayer != null) {
 			try {
-				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()!=1.00)) {
+				//Fix number 2 for issue #5.  this.getChangeSinceLastCheck() > 1 used to be != 1
+				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()>1.00)) {
 					audioPlayer.playHappyMusic();
 				}
 				if ((this.getPercentChangeSinceOpen() < 0) && (this.getChangeSinceLastCheck()<1.00)) {
@@ -222,8 +225,10 @@ public class StockQuoteAnalyzer {
 		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
-
-		return Math.round((10000 * this.currentQuote.getChange() / this.currentQuote.getOpen())) % 100.0;
+		//Fix number 1 for issue #5.  The wrong percentage was being returned.
+		double percentage = 100* this.currentQuote.getChange()/this.currentQuote.getOpen();
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
+		return Double.parseDouble(decimalFormat.format(percentage));
 	}
 
 	/**
