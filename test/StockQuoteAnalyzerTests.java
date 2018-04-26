@@ -280,6 +280,7 @@ public class StockQuoteAnalyzerTests {
         // Act
 		analyzer.refresh();
 
+
 		// Assert
         Assert.assertEquals(analyzer.getPreviousOpen(), firstReturn.getOpen(), 0.01);
 	}
