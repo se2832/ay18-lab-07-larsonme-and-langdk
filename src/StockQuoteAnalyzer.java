@@ -88,10 +88,13 @@ public class StockQuoteAnalyzer {
 			StockTickerAudioInterface audioPlayer)
 			throws InvalidStockSymbolException, NullPointerException, StockTickerConnectionError {
 		super();
-
+		//This solves issue #7 where the wrong exception was being thrown if symbol == null
+		if(symbol==null){
+			throw new InvalidStockSymbolException("Invalid stock symbol: " + symbol + ".");
+		}
 		// Check the validity of the symbol.
 		// Used to check if it was invalid, now it checks to see if it is valid to help fix issue 1
-		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol)) {
+		else if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol)) {
 			this.symbol = symbol;
 		} else {
 			//Fixes issue #1, where the wrong exception was being thrown

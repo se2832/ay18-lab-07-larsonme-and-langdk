@@ -37,6 +37,35 @@ public class StockQuoteAnalyzerTests {
 		mockedStockTickerAudio = null;
 
 	}
+
+	@Test
+	public void testShouldReturnStockQuoteAnalyzerObjectWhenConstructedWithValidInputs() throws InvalidStockSymbolException, StockTickerConnectionError {
+		//Arrange
+		//Act
+		analyzer = new StockQuoteAnalyzer("F",mockedStockQuoteGenerator,mockedStockTickerAudio);
+
+		//Assert
+		Assert.assertEquals(analyzer.getClass(),StockQuoteAnalyzer.class);
+	}
+
+	@Test(expectedExceptions = StockTickerConnectionError.class)
+	public void testShouldThrowStockTickerConnectionErrorWhenConstructorIsUnabletoConnectToStockQuoteSource() throws InvalidStockSymbolException, StockTickerConnectionError {
+		//Arrange
+		//Act
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+		//TODO Figure this one out
+		//Assert
+	}
+	//This tests issue #7
+	@Test(expectedExceptions = InvalidStockSymbolException.class)
+	public void testShouldThrowInvalidStockSymbolExceptionWhenConstructorIsPassedNullValueForStockSymbol() throws InvalidStockSymbolException, StockTickerConnectionError {
+		//Arrange
+		//Act
+		analyzer = new StockQuoteAnalyzer(null, mockedStockQuoteGenerator, mockedStockTickerAudio);
+		//Assert
+	}
+
+
 	//Tests issue number 1
 	@Test(expectedExceptions = InvalidStockSymbolException.class)
 	public void testShouldThrowExceptionWhenConstructingWithInvalidStockSymbol() throws NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
