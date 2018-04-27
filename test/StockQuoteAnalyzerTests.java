@@ -111,7 +111,8 @@ public class StockQuoteAnalyzerTests {
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		analyzer.getPreviousOpen();
+		when(analyzer.getPreviousOpen()).thenReturn(null);
+
 
 		//Assert
 	}
@@ -123,7 +124,7 @@ public class StockQuoteAnalyzerTests {
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		analyzer.getCurrentPrice();
+		when(analyzer.getCurrentPrice()).thenReturn(null);
 
         //Assert
 	}
@@ -135,7 +136,7 @@ public class StockQuoteAnalyzerTests {
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		analyzer.getChangeSinceOpen();
+		when(analyzer.getChangeSinceOpen()).thenReturn(null);
 
 		//Assert
 	}
@@ -147,21 +148,22 @@ public class StockQuoteAnalyzerTests {
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
 		//Act
-		analyzer.getPercentChangeSinceOpen();
+		when(analyzer.getPercentChangeSinceOpen()).thenReturn(null);
 
 		//Assert
 	}
 	
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetChangeSinceLastCheckNoUpdates() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void testShouldThrowExceptionWhenGetChangeSinceLastCheckNoUpdates() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError, Exception
 	{
         //Arrange
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(null);
+
 
 		//Act
 		analyzer.getChangeSinceLastCheck();
 
-		//Assert
 	}
 
 	@Test
@@ -355,9 +357,42 @@ public class StockQuoteAnalyzerTests {
         Assert.assertEquals(analyzer.getPreviousOpen(), firstReturn.getOpen(), 0.01);
 	}
 
-	
+	@Test(dataProvider = "normalOperationDataProvider")
+	public void testGetCurrentQuoteShouldReturnCorrectDataWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+																	 double percentChange) throws Exception {
 
-	
-	
-	
+		// Assert
+		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(firstReturn);
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		// Act
+		analyzer.refresh();
+
+		String expected =firstReturn.toString();
+		String actual = analyzer.getCurrentQuote().toString();
+
+
+		// Assert
+		Assert.assertEquals(expected, actual);
+	}
+
+	@Test(dataProvider = "normalOperationDataProvider")
+	public void testGetSymbolShouldReturnCorrectSymbol(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+																	 double percentChange) throws Exception {
+
+		// Assert
+		when(mockedStockQuoteGenerator.getSymbol()).thenReturn(firstReturn.getSymbol());
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		// Act
+		analyzer.refresh();
+
+		String expected =firstReturn.getSymbol();
+		String actual = analyzer.getSymbol();
+
+
+		// Assert
+		Assert.assertEquals(expected, actual);
+	}
+
 }
