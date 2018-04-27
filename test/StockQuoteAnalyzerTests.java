@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 
+import javax.xml.crypto.Data;
+
 public class StockQuoteAnalyzerTests {
 	@Mock
 	private StockQuoteGeneratorInterface mockedStockQuoteGenerator;
@@ -64,6 +66,7 @@ public class StockQuoteAnalyzerTests {
 		analyzer = new StockQuoteAnalyzer(null, mockedStockQuoteGenerator, mockedStockTickerAudio);
 		//Assert
 	}
+
 
 
 	//Tests issue number 1
@@ -192,8 +195,24 @@ public class StockQuoteAnalyzerTests {
 
 		// Assert
 		analyzer.getChangeSinceLastCheck();
-//		Assert.assertEquals(0.0, analyzer.getChangeSinceLastCheck());
+		Assert.assertEquals(0.0, analyzer.getChangeSinceLastCheck());
 	}
+
+	//This tests to make sure no audio is played if the stock ticker audio is null
+	@Test(dataProvider = "normalOperationDataProvider")
+	public void playAppropriateSoundShouldNotPlayAnyMusicIfStockTickerAudioIsNull(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+																				  double percentChange) throws Exception {
+		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(firstReturn, secondReturn);
+
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, null);
+// verify that method was never called on a mock
+		verify(mockedStockTickerAudio, never()).playErrorMusic();
+		//This tests issue #5
+		verify(mockedStockTickerAudio, never()).playHappyMusic();
+		//This tests issue #6
+		verify(mockedStockTickerAudio, never()).playSadMusic();
+	}
+
 
 	@DataProvider
 	public Object[][] normalOperationDataProvider() {
@@ -208,6 +227,17 @@ public class StockQuoteAnalyzerTests {
 				// increase
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 110.00, 10.00), 1, 0, 10.0 }, // 10.0%
 				// increase
+				//Next 5 object[] are BVA testing for happy sounds playing.  Deal with change in price and not percentage
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 200.00, 0.00), 0, 0, 0.0 }, // None
+//																														// change.
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 200.99, 0.99), 0, 0, 0.49 }, // 0.99
+				// increase
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 201.00, 1.0), 0, 0, 0.5 }, // 1.00
+//				// increase
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 201.01, 1.01), 1, 0, 0.51 }, // 1.01
+//				// increase
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 210.00, 10.00), 1, 0, 5.0 }, // 10.0
+//
 
 				{ new StockQuote("F", 100.00, 100.00, 0.00), new StockQuote("F", 100.00, 100.00, 0.00), 0, 0, 0.0 }, // No
 																														// change.
@@ -219,6 +249,17 @@ public class StockQuoteAnalyzerTests {
 				// decrease
 				{ new StockQuote("F", 100.00, 100.00, 100.00), new StockQuote("F", 100.00, 90.00, -10.0), 0, 1, -10.00 }, // 10.0%
 				// decrease
+				//Below here is BVA for change.  Used heavily for BVA in testing for what sounds should play
+				{ new StockQuote("F", 200.00, 200.00, 0.00), new StockQuote("F", 200.00, 200.00, 0.00), 0, 0, 0.0 }, // None
+//				// change.
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 199.01, -0.99), 0, 0, -0.49 }, // -0.99
+//				 decrease
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 199.00, -1.0), 0, 0, -0.50 }, // -1.0
+				// decrease
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 198.99, -1.01), 0, 1, -0.51 }, // -1.01
+				// decrease
+				{ new StockQuote("F", 200.00, 200.00, 200.00), new StockQuote("F", 200.00, 190.00, -10.0), 0, 1, -5.00 }, // -10.0
+//				// decrease
 		};
 	}
 	//Tests issue #5 and #6
