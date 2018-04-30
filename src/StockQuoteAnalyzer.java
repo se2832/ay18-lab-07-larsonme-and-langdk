@@ -36,6 +36,8 @@ import exceptions.InvalidAnalysisState;
 import exceptions.InvalidStockSymbolException;
 import exceptions.StockTickerConnectionError;
 
+import java.text.DecimalFormat;
+
 /**
  * @author schilling
  * 
@@ -81,21 +83,27 @@ public class StockQuoteAnalyzer {
 	 *             Will be thrown if the class can not connect to the stock
 	 *             quote source.
 	 */
-
 	public StockQuoteAnalyzer(String symbol, StockQuoteGeneratorInterface stockQuoteSource,
 			StockTickerAudioInterface audioPlayer)
 			throws InvalidStockSymbolException, NullPointerException, StockTickerConnectionError {
 		super();
-
+		//This solves issue #7 where the wrong exception was being thrown if symbol == null
+		if(symbol==null){
+			throw new InvalidStockSymbolException("Invalid stock symbol: " + symbol + ".");
+		}
 		// Check the validity of the symbol.
-		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol) != true) {
+		// Used to check if it was invalid, now it checks to see if it is valid to help fix issue 1
+		else if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol)) {
 			this.symbol = symbol;
 		} else {
-			throw new StockTickerConnectionError("Symbol " + symbol + "not found.");
+			//Fixes issue #1, where the wrong exception was being thrown
+			throw new InvalidStockSymbolException("Symbol " + symbol + "not found.");
 		}
 		if (stockQuoteSource == null) {
-			throw new InvalidStockSymbolException("The source for stock quotes can not be null");
+			//Fixes issue number 2 where the wrong exception was thrown here
+			throw new NullPointerException("The source for stock quotes can not be null");
 		}
+
 		this.stockQuoteSource = stockQuoteSource;
 		this.audioPlayer = audioPlayer;
 	}
@@ -113,7 +121,9 @@ public class StockQuoteAnalyzer {
 			StockQuoteInterface temp = this.stockQuoteSource.getCurrentQuote();
 
 			this.previousQuote = currentQuote;
-			this.currentQuote = this.previousQuote;
+			//Fix for part of issue #4.
+			//The program was not setting the current quote to the new value so the difference was not accurate
+			this.currentQuote = temp;
 		} catch (Exception e) {
 			throw new StockTickerConnectionError("Unable to connect with Stock Ticker Source.");
 		}
@@ -132,10 +142,13 @@ public class StockQuoteAnalyzer {
 	public void playAppropriateAudio() {
 		if (audioPlayer != null) {
 			try {
-				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()!=1.00)) {
+				//Fix number 2 for issue #5.  this.getChangeSinceLastCheck() > 1 used to be != 1
+				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()>1.00)) {
 					audioPlayer.playHappyMusic();
 				}
-				if ((this.getPercentChangeSinceOpen() < 0) && (this.getChangeSinceLastCheck()<1.00)) {
+				//Fix for issue #6.  Changed if statement to else if since you won't play happy and sad tones at the same time
+				//Also changed this.getPercentChangeSinceOpen() < 0 to <= 1 and the || in the middle used to be &&
+				else if ((this.getPercentChangeSinceOpen() <= -1) || (this.getChangeSinceLastCheck()<-1.00)) {
 					audioPlayer.playSadMusic();
 				}
 			} catch (InvalidAnalysisState e) {
@@ -157,13 +170,14 @@ public class StockQuoteAnalyzer {
 	/**
 	 * This method will return the previous open for the given stock.
 	 * 
-	 * @return The previous closing value for the stock will be returned.
+	 * @return The previous opening value for the stock will be returned.
 	 * @throws InvalidAnalysisState
 	 *             An InvalidAnalysisState Exception will be thrown if a quote
 	 *             has not yet been retrieved.
 	 */
 	public double getPreviousOpen() throws InvalidAnalysisState {
-		if (currentQuote != null) {
+		//Fix for issue #3, the line used to be if (currentQuote != null) but that was incorrect
+		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
 		return currentQuote.getOpen();
@@ -178,6 +192,7 @@ public class StockQuoteAnalyzer {
 	 *             An InvalidAnalysisState Exception will be thrown if a quote
 	 *             has not yet been retrieved.
 	 */
+	//TODO 2 basis paths
 	public double getCurrentPrice() throws InvalidAnalysisState {
 		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
@@ -215,8 +230,10 @@ public class StockQuoteAnalyzer {
 		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
-
-		return Math.round((10000 * this.currentQuote.getChange() / this.currentQuote.getOpen())) % 100.0;
+		//Fix number 1 for issue #5.  The wrong percentage was being returned.
+		double percentage = 100* this.currentQuote.getChange()/this.currentQuote.getOpen();
+		DecimalFormat decimalFormat = new DecimalFormat("#.##");
+		return Double.parseDouble(decimalFormat.format(percentage));
 	}
 
 	/**
@@ -238,8 +255,8 @@ public class StockQuoteAnalyzer {
 		if (previousQuote == null) {
 			throw new InvalidAnalysisState("A second update has not yet occurred.");
 		}
-
-		return currentQuote.getLastTrade() - previousQuote.getChange();
+		//Final fix for issue #4. Changes previousQuote.getChange() to previousQuote.getLastTrade()
+		return currentQuote.getLastTrade() - previousQuote.getLastTrade();
 	}
 
 	/**
