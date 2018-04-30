@@ -83,7 +83,6 @@ public class StockQuoteAnalyzer {
 	 *             Will be thrown if the class can not connect to the stock
 	 *             quote source.
 	 */
-
 	public StockQuoteAnalyzer(String symbol, StockQuoteGeneratorInterface stockQuoteSource,
 			StockTickerAudioInterface audioPlayer)
 			throws InvalidStockSymbolException, NullPointerException, StockTickerConnectionError {
@@ -193,6 +192,7 @@ public class StockQuoteAnalyzer {
 	 *             An InvalidAnalysisState Exception will be thrown if a quote
 	 *             has not yet been retrieved.
 	 */
+	//TODO 2 basis paths
 	public double getCurrentPrice() throws InvalidAnalysisState {
 		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");

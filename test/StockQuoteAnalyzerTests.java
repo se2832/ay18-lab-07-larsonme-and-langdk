@@ -41,7 +41,7 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	@Test
-	public void testShouldReturnStockQuoteAnalyzerObjectWhenConstructedWithValidInputs() throws InvalidStockSymbolException, StockTickerConnectionError {
+	public void constructorShouldReturnStockQuoteAnalyzerObjectWhenConstructedWithValidInputs() throws InvalidStockSymbolException, StockTickerConnectionError {
 		//Arrange
 		//Act
 		analyzer = new StockQuoteAnalyzer("F",mockedStockQuoteGenerator,mockedStockTickerAudio);
@@ -50,17 +50,11 @@ public class StockQuoteAnalyzerTests {
 		Assert.assertEquals(analyzer.getClass(),StockQuoteAnalyzer.class);
 	}
 
-	@Test(expectedExceptions = StockTickerConnectionError.class)
-	public void testShouldThrowStockTickerConnectionErrorWhenConstructorIsUnabletoConnectToStockQuoteSource() throws InvalidStockSymbolException, StockTickerConnectionError {
-		//Arrange
-		//Act
-		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
-		//TODO Figure this one out
-		//Assert
-	}
+
+
 	//This tests issue #7
 	@Test(expectedExceptions = InvalidStockSymbolException.class)
-	public void testShouldThrowInvalidStockSymbolExceptionWhenConstructorIsPassedNullValueForStockSymbol() throws InvalidStockSymbolException, StockTickerConnectionError {
+	public void constructorShouldThrowInvalidStockSymbolExceptionWhenConstructorIsPassedNullValueForStockSymbol() throws InvalidStockSymbolException, StockTickerConnectionError {
 		//Arrange
 		//Act
 		analyzer = new StockQuoteAnalyzer(null, mockedStockQuoteGenerator, mockedStockTickerAudio);
@@ -71,7 +65,7 @@ public class StockQuoteAnalyzerTests {
 
 	//Tests issue number 1
 	@Test(expectedExceptions = InvalidStockSymbolException.class)
-	public void testShouldThrowExceptionWhenConstructingWithInvalidStockSymbol() throws NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void constructorShouldThrowExceptionWhenConstructingWithInvalidStockSymbol() throws NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
 		//Arrange
         //Act
@@ -81,7 +75,7 @@ public class StockQuoteAnalyzerTests {
 	}
 	//Test issue number 2
 	@Test(expectedExceptions = NullPointerException.class)
-	public void testShouldThrowExceptionWhenConstructingWithNullSource() throws NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void constructorShouldThrowExceptionWhenConstructingWithNullSource() throws NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
         //Arrange
         //Act
@@ -91,7 +85,7 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	@Test(expectedExceptions = StockTickerConnectionError.class)
-	public void testShouldThrowExceptionWhenRefreshConnectionError() throws StockTickerConnectionError, NullPointerException, InvalidStockSymbolException, Exception
+	public void refreshShouldThrowExceptionWhenRefreshConnectionError() throws StockTickerConnectionError, NullPointerException, InvalidStockSymbolException, Exception
 	{
 		// Arrange
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenThrow(new Exception());
@@ -105,60 +99,55 @@ public class StockQuoteAnalyzerTests {
 
 	//Test for issue #3
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetPreviousOpenInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void getPerviousOpenShouldThrowExceptionWhenCalledBeforeRefresh() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
         //Arrange
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		when(analyzer.getPreviousOpen()).thenReturn(null);
-
+		analyzer.getPreviousOpen();
 
 		//Assert
 	}
-	
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetCurrentPriceInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void getCurrentPriceShouldThrowExceptionWhenCalledBeforeRefresh() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
         //Arrange
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		when(analyzer.getCurrentPrice()).thenReturn(null);
+		analyzer.getCurrentPrice();
 
         //Assert
 	}
-	
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetChangeSinceOpenInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void getChangeSinceOpenShouldThrowExceptionCalledBeforeRefreshIsCalled() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
         //Arrange
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
-		when(analyzer.getChangeSinceOpen()).thenReturn(null);
+		when(analyzer.getChangeSinceOpen());
 
 		//Assert
 	}
-	
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetPercentChangeSinceOpenInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
+	public void getPercentChangeSinceOpenShouldThrowExceptionWhenCalledBeforeRefresh() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError
 	{
         //Arrange
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
 		//Act
-		when(analyzer.getPercentChangeSinceOpen()).thenReturn(null);
+		analyzer.getPercentChangeSinceOpen();
 
 		//Assert
 	}
 	
 	@Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldThrowExceptionWhenGetChangeSinceLastCheckNoUpdates() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError, Exception
+	public void getChangeSinceLastCheckShouldThrowExceptionWhenCalledBeforeRefresh() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError, Exception
 	{
         //Arrange
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
-		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(null);
 
 
 		//Act
@@ -167,10 +156,9 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	@Test
-	public void testShouldPlayAppropriateAudioWhenNoValidUpdates() throws Exception
+	public void playAppropriateAudioShouldPlayAppropriateAudio() throws Exception
 	{
 		// Arrange - setup the expected calls.
-        //TODO Telling the mocked generator to return null when getCurrentQuote is called
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(null);
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
@@ -186,7 +174,7 @@ public class StockQuoteAnalyzerTests {
 
 	//Test for issue #4
     @Test(expectedExceptions = InvalidAnalysisState.class)
-	public void testShouldGetChangeSinceLastCheckOneUpdate() throws Exception
+	public void getChangeSinceLastCheckShouldReturnTheChangeWhenOnlyOneUpdate() throws Exception
 	{
 		// Arrange - Setup the expected calls.
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
@@ -266,7 +254,7 @@ public class StockQuoteAnalyzerTests {
 	}
 	//Tests issue #5 and #6
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetPercentChangeSinceLastOpenShouldReturnCorrectPercentChangedWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getPercentChangeSinceLastOpenShouldReturnCorrectPercentChangedWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 			double percentChange) throws Exception {
 
 	    // Arrange
@@ -298,7 +286,7 @@ public class StockQuoteAnalyzerTests {
 	
 	
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetChangeSinceLastCheckShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getChangeSinceLastCheckShouldReturnCorrectChangeWhenCalledAfterTwoReefreshes(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 			double percentChange) throws Exception {
 
 	    // Arrange
@@ -314,7 +302,7 @@ public class StockQuoteAnalyzerTests {
 	}
 	
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetChangeSinceOpenShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getChangeSinceOpenShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 			double percentChange) throws Exception {
 		// Arrange - Setup the expected calls.
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(firstReturn);
@@ -342,7 +330,7 @@ public class StockQuoteAnalyzerTests {
 	}
 	
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetPreviousOpenShouldReturnCorrectDataWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getPreviousOpenShouldReturnCorrectDataWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 			double percentChange) throws Exception {
 
 	    // Assert
@@ -358,7 +346,7 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetCurrentQuoteShouldReturnCorrectDataWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getCurrentQuoteShouldReturnCorrectDataWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 																	 double percentChange) throws Exception {
 
 		// Assert
@@ -377,7 +365,7 @@ public class StockQuoteAnalyzerTests {
 	}
 
 	@Test(dataProvider = "normalOperationDataProvider")
-	public void testGetSymbolShouldReturnCorrectSymbol(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+	public void getSymbolShouldReturnSymbolWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
 																	 double percentChange) throws Exception {
 
 		// Assert
